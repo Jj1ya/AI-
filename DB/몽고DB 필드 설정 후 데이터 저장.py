@@ -8,7 +8,7 @@ db = client['export_recommendation']
 collection = db['TradeStatistics']
 
 # API 호출 및 데이터 가져오기
-url = 'https://apis.data.go.kr/1220000/nitemtrade/getNitemtradeList?serviceKey=6mxlnmF2RW8P0hqL52XMnCQ3LxEjCv5lUeischYP8jDaV1f3DL4J4xQ5HC%2BfupUDW7tiHADCftmhbL8gi2bjnQ%3D%3D&strtYymm=202201&endYymm=202212&cntyCD=US'
+url = 'https://apis.data.go.kr/1220000/nitemtrade/getNitemtradeList?serviceKey=6mxlnmF2RW8P0hqL52XMnCQ3LxEjCv5lUeischYP8jDaV1f3DL4J4xQ5HC%2BfupUDW7tiHADCftmhbL8gi2bjnQ%3D%3D&strtYymm=202208&endYymm=202212&cntyCD=TW'
 response = requests.get(url)
 root = ET.fromstring(response.content)
 
