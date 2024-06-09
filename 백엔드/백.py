@@ -1,21 +1,39 @@
-from flask import Flask, jsonify
-from pymongo import MongoClient
+# myapp/models.py
+from django.db import models
 
-app = Flask(__name__)
+class Post(models.Model):
+    title = models.CharField(max_length=100)
+    content = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
 
-# MongoDB 클라이언트 설정
-client = MongoClient('mongodb://localhost:27017/')
-db = client['economic_data']
-collection = db['economicIndicators']
+# myapp/serializers.py
+from rest_framework import serializers
+from .models import Post
 
-@app.route('/api/economic-data/<country>', methods=['GET'])
-def get_economic_data(country):
-    data = collection.find_one({"country": country})
-    if data:
-        data.pop('_id')  # MongoDB의 ObjectId는 JSON 직렬화 불가하므로 제거
-        return jsonify(data)
-    else:
-        return jsonify({"error": "Data not found"}), 404
+class PostSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Post
+        fields = ['id', 'title', 'content', 'created_at']
 
-if __name__ == '__main__':
-    app.run(debug=True)
+# myapp/views.py
+from rest_framework import viewsets
+from .models import Post
+from .serializers import PostSerializer
+
+class PostViewSet(viewsets.ModelViewSet):
+    queryset = Post.objects.all()
+    serializer_class = PostSerializer
+
+# myproject/urls.py
+from django.contrib import admin
+from django.urls import path, include
+from rest_framework.routers import DefaultRouter
+from myapp.views import PostViewSet
+
+router = DefaultRouter()
+router.register(r'posts', PostViewSet)
+
+urlpatterns = [
+    path('admin/', admin.site.urls),
+    path('api/', include(router.urls)),
+]
