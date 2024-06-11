@@ -127,46 +127,51 @@
         © 2024 동서대학교 소프트웨어학과 졸업작품
     </footer>
     <script>
-        function getRecommendation() {
+        async function getRecommendation() {
             const userInput = document.getElementById('userInput').value;
             const resultsDiv = document.getElementById('results');
-    
+          
             // 입력값의 유효성을 검사합니다.
             if (!userInput || userInput.trim() === '') {
-                resultsDiv.innerHTML = `<p class="text-danger">입력값을 확인해주세요.</p>`;
-                return;
+              resultsDiv.innerHTML = `<p class="text-danger">입력값을 확인해주세요.</p>`;
+              return;
             }
-    
-            // 엔드포인트 선택 (예시로 country 추천)
-            const endpoint = userInput.match(/^\d{6}$/) ? '/recommend_item' : '/recommend_country';
-    
-            fetch(endpoint, {
+          
+            try {
+              // 엔드포인트 선택 (예시로 country 추천)
+              const endpoint = userInput.match(/^\d{6}$/) ? '/recommend_item' : '/recommend_country';
+          
+              const response = await fetch(endpoint, {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json'
+                  'Content-Type': 'application/json',
+                  'credentials': 'include' // credentials 옵션 추가
                 },
                 body: JSON.stringify({ item: userInput, country: userInput })
-            })
-            .then(response => response.json())
-            .then(data => {
-                resultsDiv.innerHTML = '';
-                if (data.error) {
-                    resultsDiv.innerHTML = `<p class="text-danger">${data.error}</p>`;
-                } else {
-                    data.forEach(item => {
-                        const resultItem = document.createElement('div');
-                        resultItem.className = 'result-item';
-                        resultItem.innerHTML = `
-                            <h3>추천: ${item}</h3>
-                        `;
-                        resultsDiv.appendChild(resultItem);
-                    });
-                }
-            })
-            .catch(error => {
-                resultsDiv.innerHTML = `<p class="text-danger">오류 발생: ${error.message}</p>`;
-            });
-        }
+              });
+          
+              const data = await response.json();
+          
+              resultsDiv.innerHTML = '';
+              if (data.error) {
+                // 오류 메시지 처리
+                resultsDiv.innerHTML = `<p class="text-danger">${data.error}</p>`;
+              } else {
+                // 정상적인 응답 처리
+                data.forEach(item => {
+                  const resultItem = document.createElement('div');
+                  resultItem.className = 'result-item';
+                  resultItem.innerHTML = `
+                    <h3>추천: ${item}</h3>
+                  `;
+                  resultsDiv.appendChild(resultItem);
+                });
+              }
+            } catch (error) {
+              // 네트워크 오류 등 처리
+              resultsDiv.innerHTML = `<p class="text-danger">오류 발생: ${error.message}</p>`;
+            }
+          }
     </script>
 </body>
 </html>
